@@ -1,0 +1,23 @@
+{
+    "name": "jmdweb/installer",
+    "description": "To install the packages of JMD Web.\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D quickly install the packages of JMD Web.",
+    "autoload": {
+        "psr-4": {
+            "Jmdweb\\Installer\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Pappu Singh",
+            "email": "pappu@jmdweb.nl"
+        }
+    ],
+    "require": {},
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Jmdweb\\Installer\\JMDWebInstallerServiceProvider"
+            ]
+        }
+    }
+}
