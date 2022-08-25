@@ -1,6 +1,7 @@
 {
     "name": "jmdweb/installer",
-    "description": "To install the packages of JMD Web.\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D\u001b[D quickly install the packages of JMD Web.",
+    "description": "To quickly install the packages of JMD Web.",
+    "license": "MIT",
     "autoload": {
         "psr-4": {
             "Jmdweb\\Installer\\": "src/"
