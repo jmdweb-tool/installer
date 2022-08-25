@@ -8,7 +8,7 @@ use Symfony\Component\Process\Process;
 class JMDWebInstallCommand extends Command
 {
     use InstallBreezeInertia;
-    
+
     /**
      * The name and signature of the console command.
      *
@@ -41,7 +41,7 @@ class JMDWebInstallCommand extends Command
     public function handle()
     {
 
-        return 0;
+        $this->installBreezeInertia();
     }
 
     /**

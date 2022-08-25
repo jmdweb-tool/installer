@@ -1,7 +1,7 @@
 <?php
-namespace Jmdweb\Installer;
+namespace Jmdweb\Installer\Console\Commands;
 
-class InstallBreezeInertia {
+trait InstallBreezeInertia {
     
     public function installBreezeInertia()
     {
