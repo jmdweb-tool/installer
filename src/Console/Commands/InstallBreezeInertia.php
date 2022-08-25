@@ -6,7 +6,7 @@ trait InstallBreezeInertia {
     public function installBreezeInertia()
     {
         // Install Inertia...
-        $this->requireComposerPackages('inertiajs/inertia-laravel:^0.5.4', 'laravel/sanctum:^2.8', 'tightenco/ziggy:^1.0');
+        $this->requireComposerPackages('inertiajs/inertia-laravel:^0.5.4', 'laravel/sanctum:^2.8', 'tightenco/ziggy:^1.0', 'wikimedia/composer-merge-plugin:^2.0');
 
         // NPM Packages...
         $this->updateNodePackages(function ($packages) {

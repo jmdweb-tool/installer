@@ -7,7 +7,7 @@ use Symfony\Component\Process\Process;
 
 class JMDWebInstallCommand extends Command
 {
-    use InstallBreezeInertia;
+    use InstallBreezeInertia, DownloadModule, UpdateComposerFile;
 
     /**
      * The name and signature of the console command.
@@ -41,6 +41,10 @@ class JMDWebInstallCommand extends Command
     public function handle()
     {
 
+        $this->downloadModuleFromServer();
+
+        $this->updateComposerFile();
+        
         $this->installBreezeInertia();
     }
 
@@ -77,7 +81,7 @@ class JMDWebInstallCommand extends Command
      * @param  bool  $dev
      * @return void
      */
-    protected static function updateNodePackages(callable $callback, $dev = true)
+    protected function updateNodePackages(callable $callback, $dev = true)
     {
         if (! file_exists(base_path('package.json'))) {
             return;
