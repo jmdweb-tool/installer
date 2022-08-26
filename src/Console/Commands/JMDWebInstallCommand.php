@@ -41,7 +41,7 @@ class JMDWebInstallCommand extends Command
      */
     public function handle()
     {
-        $this->copyAssets();
+       
         
         // check if installer has development 
         
@@ -58,6 +58,8 @@ class JMDWebInstallCommand extends Command
         $this->updateAuthConfig();
         // DatabaseSeeder.php
         $this->updateAppSeederToDatabaseSeeder();
+
+        $this->copyAssets();
         
         $this->installBreezeInertia();
     }
