@@ -12,7 +12,7 @@ trait CopyWebpackMix
             return;
         }
 
-        $update_mix = file_get_contents(base_path('Jmdweb/webpack.mix.js'));
+        $update_mix = file_get_contents(base_path('Jmdweb/stubs/webpack.mix.js'));
 
         $mix = file_put_contents(base_path('webpack.mix.js'), $update_mix.PHP_EOL , FILE_APPEND | LOCK_EX);
     }

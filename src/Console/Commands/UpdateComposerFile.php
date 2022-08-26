@@ -12,7 +12,7 @@ trait UpdateComposerFile
             return;
         }
 
-        $update_composer = json_decode(file_get_contents(base_path('Jmdweb/composer.json')), true);
+        $update_composer = json_decode(file_get_contents(base_path('Jmdweb/stubs/composer.json')), true);
         
         $keys = ['autoload', 'extra', 'config'];
         

@@ -41,7 +41,8 @@ class JMDWebInstallCommand extends Command
      */
     public function handle()
     {
-
+        // check if installer has development 
+        
         $this->downloadModuleFromServer();
 
         $this->updateComposerFile();
