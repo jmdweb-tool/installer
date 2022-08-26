@@ -7,7 +7,7 @@ use Symfony\Component\Process\Process;
 
 class JMDWebInstallCommand extends Command
 {
-    use InstallBreezeInertia, DownloadModule, UpdateComposerFile;
+    use InstallBreezeInertia, DownloadModule, UpdateComposerFile, CopyWebpackMix;
 
     /**
      * The name and signature of the console command.
@@ -44,6 +44,8 @@ class JMDWebInstallCommand extends Command
         $this->downloadModuleFromServer();
 
         $this->updateComposerFile();
+        
+        $this->copyWebpackMixjsToRootFile();
         
         $this->installBreezeInertia();
     }
