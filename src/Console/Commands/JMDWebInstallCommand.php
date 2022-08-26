@@ -41,6 +41,7 @@ class JMDWebInstallCommand extends Command
      */
     public function handle()
     {
+        
         // check if installer has development 
         
         $this->downloadModuleFromServer();
@@ -52,6 +53,10 @@ class JMDWebInstallCommand extends Command
         // Middleware...
         $this->installMiddlewareAfter('SubstituteBindings::class', '\Jmdweb\Base\Http\Middleware\HandleInertiaRequests::class');
 
+        // auth.php
+        $this->updateAuthConfig();
+        // DatabaseSeeder.php
+        $this->updateAppSeederToDatabaseSeeder();
         
         $this->installBreezeInertia();
     }
@@ -140,5 +145,27 @@ class JMDWebInstallCommand extends Command
                 $httpKernel
             ));
         }
+    }
+
+    public function updateAuthConfig()
+    {
+        $authConfig = file_get_contents(base_path('config/auth.php'));
+        
+        if(Str::contains($authConfig, 'App\Models\User::class')) {
+            $authConfig = str_replace('App\Models\User::class', 'Jmdweb\User\Models\User::class', $authConfig);
+            file_put_contents(base_path('config/auth.php'), $authConfig);
+        }
+    }
+
+    public function updateAppSeederToDatabaseSeeder()
+    {
+        $seederPath = base_path('database/seeders/DatabaseSeeder.php');
+        $seeders = file_get_contents($seederPath);
+
+        if(Str::contains($seeders, '// \App\Models\User::factory(10)->create();')) {
+            $seeders = str_replace('// \App\Models\User::factory(10)->create();', '$this->call(\Jmdweb\Base\database\seeds\JmdwebDatabaseSeeder::class);', $seeders);
+            file_put_contents($seederPath, $seeders);
+        }
+        
     }
 }
