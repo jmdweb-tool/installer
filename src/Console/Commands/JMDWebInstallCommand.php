@@ -3,6 +3,7 @@
 namespace Jmdweb\Installer\Console\Commands;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
 
 class JMDWebInstallCommand extends Command
@@ -46,6 +47,10 @@ class JMDWebInstallCommand extends Command
         $this->updateComposerFile();
         
         $this->copyWebpackMixjsToRootFile();
+
+        // Middleware...
+        $this->installMiddlewareAfter('SubstituteBindings::class', '\Jmdweb\Base\Http\Middleware\HandleInertiaRequests::class');
+
         
         $this->installBreezeInertia();
     }
@@ -104,5 +109,35 @@ class JMDWebInstallCommand extends Command
             base_path('package.json'),
             json_encode($packages, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT).PHP_EOL
         );
+    }
+
+    /**
+     * Install the middleware to a group in the application Http Kernel.
+     *
+     * @param  string  $after
+     * @param  string  $name
+     * @param  string  $group
+     * @return void
+     */
+    protected function installMiddlewareAfter($after, $name, $group = 'web')
+    {
+        $httpKernel = file_get_contents(app_path('Http/Kernel.php'));
+
+        $middlewareGroups = Str::before(Str::after($httpKernel, '$middlewareGroups = ['), '];');
+        $middlewareGroup = Str::before(Str::after($middlewareGroups, "'$group' => ["), '],');
+
+        if (! Str::contains($middlewareGroup, $name)) {
+            $modifiedMiddlewareGroup = str_replace(
+                $after.',',
+                $after.','.PHP_EOL.'            '.$name.',',
+                $middlewareGroup,
+            );
+
+            file_put_contents(app_path('Http/Kernel.php'), str_replace(
+                $middlewareGroups,
+                str_replace($middlewareGroup, $modifiedMiddlewareGroup, $middlewareGroups),
+                $httpKernel
+            ));
+        }
     }
 }
