@@ -5,10 +5,14 @@ namespace Jmdweb\Installer\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Str;
 use Symfony\Component\Process\Process;
+use Illuminate\Support\Facades\Validator;
+use GuzzleHttp\TransferStats;
 
 class JMDWebInstallCommand extends Command
 {
     use InstallBreezeInertia, DownloadModule, UpdateComposerFile, CopyWebpackMix, CopyAssets;
+
+    public $serverUrl = "https://newcms.jmddesign.nl";
 
     /**
      * The name and signature of the console command.
@@ -41,12 +45,12 @@ class JMDWebInstallCommand extends Command
      */
     public function handle()
     {
-       
+
+        $uri = $this->validateLicense();
         
         // check if installer has development 
         
-        $this->downloadModuleFromServer();
-
+        $this->downloadModuleFromServer($uri);
         $this->updateComposerFile();
         
         $this->copyWebpackMixjsToRootFile();
@@ -170,5 +174,121 @@ class JMDWebInstallCommand extends Command
             file_put_contents($seederPath, $seeders);
         }
         
+    }
+
+    public function validateLicense()
+    {
+        $verified = false;
+        $domain = $this->askInstallationDomain();//"http://jmdweb.nl";
+        
+        while(!$verified) {
+    
+            $license = $this->askLicenseKey(); //"1re2adwktRBqzqnAJIdJCA==";
+    
+    
+            $response = $this->checkIfLicenseIsValid($domain, $license);
+            
+            $status = false;
+            $message = '';
+            if(is_array($response)) {
+                $status = $response['status'] == 'success';
+                $message = $response['message'] ?? '';
+            }
+
+            $verified = $status;
+            if (!empty($message)) {
+                $this->line($message, $status ? 'info' : 'error');
+            }
+        }
+
+        return $this->serverUrl."/download/cms?action=download&license_key=".$license;
+
+    }
+
+    /**
+     * @return string
+     */
+    protected function askInstallationDomain()
+    {
+        do {
+            $domain = $this->ask('Enter your application domain (the domain that needs to be attached to your license)');
+
+            $validator = Validator::make(['domain' => $domain], [
+                'domain' => ['required', 'url', function ($attribute, $value, $fail) {
+                    if ($this->strpos_arr($value)) {
+                        $fail($attribute . ' not a valid live url.');
+                    }
+                },],
+            ]);
+
+            if ($validator->fails()) {
+                $this->warn(join('|', $validator->errors()->get('domain')));
+                $domain = '';
+            }
+        } while (empty($domain));
+
+        return $domain;
+    }
+
+    /**
+     * @return string
+     */
+    public function askLicenseKey()
+    {
+        do {
+            $license = $this->ask('Enter license code to download module');
+
+            $validator = Validator::make(['license' => $license], [
+                'license' => 'required',
+            ]);
+
+            if ($validator->fails()) {
+                $this->warn(join('|', $validator->errors()->get('license')));
+                $license = '';
+            }
+        } while (empty($license));
+
+        return $license;
+    }
+
+    private function strpos_arr($domain)
+    {
+        $haystack = ['localhost', '.loc', '.dev', '127.0.0.1', 'dev.', 'test'];
+
+        foreach ($haystack as $what) {
+            if (($pos = strpos($domain, $what)) !== false) return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param $domain
+     * @param $license
+     * @return bool|mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    protected function checkIfLicenseIsValid($domain, $license)
+    {
+        try {
+            $client = new \GuzzleHttp\Client();
+            
+            $res = $client->request('GET', $this->serverUrl."/download/cms", [
+                'query' => [
+                    'license_key' => $license,
+                    'domain' => $domain,
+                    'action' => 'checkLicense',
+                    'laravel_version' => app()->version(),
+                ],
+                'on_stats' => function (TransferStats $stats) use (&$url) {
+                    $url = $stats->getEffectiveUri();
+                }
+            ]);
+            $check_updates_result = json_decode($res->getBody(), true);
+            return $check_updates_result;
+        } catch (Exception $e) {
+            $this->command->error($e->getMessage());
+            return false;
+        }
     }
 }

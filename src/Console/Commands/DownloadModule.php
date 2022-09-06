@@ -2,20 +2,27 @@
 
 namespace Jmdweb\Installer\Console\Commands;
 
+use Illuminate\Support\Str;
+
 trait DownloadModule
 {
 
-    public $downloadUrl = 'https://newcms.jmddesign.nl/modules/8x/jmdweb-cms-0.0.1.zip';
-
-    public function downloadModuleFromServer()
+    public function getDownloadLink($licence_key)
     {
-        $file = $this->download();
+        return rtrim(config('app.url'), "/")."/download/".$licence_key."/cms";
+        
+    }
+
+
+    public function downloadModuleFromServer($uri)
+    {
+        $file = $this->download($uri);
 
         $this->extractFile($file);
     }
 
 
-    public function download()
+    public function download($uri)
     {
         $this->info('Downloading zip file from server...');
 
@@ -23,7 +30,7 @@ trait DownloadModule
 
         $file_name_temp = $temp_path . "/main.zip";
 
-        $modules = file_get_contents($this->downloadUrl);
+        $modules = file_get_contents($uri);
 
         if ($result = json_decode($modules, true)) {
             if (isset($result['status']) && $result['status'] == "error") {
